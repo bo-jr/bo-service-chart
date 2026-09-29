@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "bo-service-chart values",
+  "description": "Every rule the lab states about a service is enforced here, so a mistake fails at render time — in CI, before anything reaches bo-deploy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "chartVersion", "name", "version", "image", "workload", "replicas",
+    "dependencies", "env", "secretEnv", "otlpEndpoint", "resources"
+  ],
+  "properties": {
+    "chartVersion": {
+      "description": "Exact chart version this service is pinned to; must equal Chart.yaml's version.",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "name": {
+      "description": "In-cluster name. The bo- prefix stops at the repo boundary.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,40}$",
+      "not": { "pattern": "^bo-" }
+    },
+    "version": {
+      "description": "Human version (v1, v2.1). A SHA or digest here would be an unbounded metric label.",
+      "type": "string",
+      "pattern": "^v[0-9]+(\\.[0-9]+)*$"
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "digest"],
+      "properties": {
+        "repository": {
+          "description": "registry[:port]/path — no tag; the tag position is where floating references hide.",
+          "type": "string",
+          "pattern": "^[a-z0-9.-]+(:[0-9]+)?(/[a-z0-9._-]+)+$"
+        },
+        "digest": {
+          "description": "Manifest-list index digest.",
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "workload": {
+      "description": "Rollout joins in Phase 6, with the Argo Rollouts CRD.",
+      "enum": ["Deployment"]
+    },
+    "replicas": { "type": "integer", "minimum": 0 },
+    "dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "not": { "pattern": "^bo-" } }
+    },
+    "env": {
+      "description": "Plain env vars. Names the chart sets itself are reserved.",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Z_][A-Z0-9_]*$",
+        "not": { "enum": ["PORT", "APP_VERSION", "DEPENDENCIES", "OTEL_EXPORTER_OTLP_ENDPOINT"] }
+      },
+      "additionalProperties": { "type": "string" }
+    },
+    "secretEnv": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "secret", "key"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[A-Z_][A-Z0-9_]*$" },
+          "secret": { "type": "string", "minLength": 1 },
+          "key": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "otlpEndpoint": { "type": "string" },
+    "resources": {
+      "description": "Required, with no default: never install at default resources.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requests", "limits"],
+      "properties": {
+        "requests": { "$ref": "#/definitions/cpuMemory" },
+        "limits": { "$ref": "#/definitions/cpuMemory" }
+      }
+    }
+  },
+  "definitions": {
+    "cpuMemory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cpu", "memory"],
+      "properties": {
+        "cpu": { "type": ["string", "number"] },
+        "memory": { "type": "string" }
+      }
+    }
+  }
+}
