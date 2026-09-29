@@ -1,0 +1,20 @@
+# A complete, valid values set — the baseline every negative case in run.sh
+# breaks exactly one thing in.
+chartVersion: 0.1.0
+name: storefront
+version: v1
+image:
+  repository: ghcr.io/bo-jr/bo-storefront
+  digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+workload: Deployment
+replicas: 1
+dependencies: [catalog, pricing]
+env:
+  FAILURE_RATE: "0"
+  EXTRA_LATENCY_MS: "0"
+secretEnv:
+  - { name: DATABASE_URL, secret: catalog-db-app, key: uri }
+otlpEndpoint: ""
+resources:
+  requests: { cpu: 50m,  memory: 64Mi }
+  limits:   { cpu: 500m, memory: 128Mi }

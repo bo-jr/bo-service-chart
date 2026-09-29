@@ -1,0 +1,49 @@
+# Values for the shared service chart. Each service repo supplies its own in
+# chart-values.yaml; see values.schema.json for what is required and why.
+#
+# Deliberately NO defaults for: chartVersion, name, version, image, resources.
+# A service that forgets one fails to render instead of inheriting a guess.
+
+# Must equal this chart's version (Chart.yaml). The service repo pins the chart
+# here; rendering with any other chart version fails.
+chartVersion: ""
+
+# In-cluster name, WITHOUT the bo- prefix: storefront, catalog, pricing.
+name: ""
+
+# Human version (v1, v2). Becomes APP_VERSION — the `version` label on every
+# metric — and the pod's `version` label. Never a SHA or digest.
+version: ""
+
+image:
+  # WITH the bo- prefix: ghcr.io/bo-jr/bo-storefront.
+  repository: ""
+  # Manifest-list INDEX digest, never per-arch. Supplied at render time by CI
+  # (Phase 3) or `task sandbox:deploy`, never committed in a service repo.
+  digest: ""
+
+# Deployment only until Phase 6 adds Rollout — the one conditional that earns
+# its place.
+workload: Deployment
+
+replicas: 1
+
+# Services this one calls. Feeds the kit's /readyz dependency checks now, and
+# the AuthorizationPolicy allow rules in Phase 5.
+dependencies: []
+
+# Plain env vars, string values only. Chaos knobs live here:
+# FAILURE_RATE, EXTRA_LATENCY_MS, CPU_BURN_FACTOR.
+env: {}
+
+# Env vars read from Secrets: [{name: DATABASE_URL, secret: catalog-db-app, key: uri}]
+secretEnv: []
+
+# OTLP/HTTP endpoint of the local Alloy (Phase 4). Empty means no exporter;
+# trace IDs are still minted and propagated.
+otlpEndpoint: ""
+
+# Required, no default — never install at default resources.
+# resources:
+#   requests: { cpu: 50m,  memory: 64Mi }
+#   limits:   { cpu: 500m, memory: 128Mi }
