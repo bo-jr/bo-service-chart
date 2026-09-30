@@ -5,7 +5,7 @@ type: application
 # Pinned by exact version in each service's chart-values.yaml (`chartVersion`).
 # Templates render only if the two agree. No appVersion: each service carries
 # its own `version`, and the chart is not an application.
-version: 0.1.0
+version: 0.2.0
 home: https://github.com/bo-jr/bo-service-chart
 # sources[0] becomes the OCI `org.opencontainers.image.source` annotation, which
 # links the ghcr package to this repository.

@@ -5,7 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "chartVersion", "name", "version", "image", "workload", "replicas",
+    "chartVersion", "name", "version", "image", "commitTimestamp", "workload", "replicas",
     "dependencies", "env", "secretEnv", "otlpEndpoint", "resources"
   ],
   "properties": {
@@ -41,6 +41,11 @@
           "pattern": "^sha256:[0-9a-f]{64}$"
         }
       }
+    },
+    "commitTimestamp": {
+      "description": "Committer date of the source commit, RFC3339 UTC, no fractional seconds. DORA lead time (Phase 7) is measured from it.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
     },
     "workload": {
       "description": "Rollout joins in Phase 6, with the Argo Rollouts CRD.",

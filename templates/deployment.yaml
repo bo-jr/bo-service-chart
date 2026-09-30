@@ -4,6 +4,11 @@ metadata:
   name: {{ .Values.name }}
   labels:
     {{- include "service.labels" . | nindent 4 }}
+  # On the workload only: never the pod template, so a new timestamp alone
+  # never restarts pods, and never the Service or ServiceAccount, so they do
+  # not diff between builds. The DORA exporter reads it here (Phase 7).
+  annotations:
+    gitops-lab/commit-timestamp: {{ .Values.commitTimestamp | quote }}
 spec:
   replicas: {{ .Values.replicas }}
   revisionHistoryLimit: 3
