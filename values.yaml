@@ -22,6 +22,12 @@ image:
   # (Phase 3) or `task sandbox:deploy`, never committed in a service repo.
   digest: ""
 
+# Committer date of the source commit, RFC3339 in UTC (2026-09-30T14:05:00Z).
+# Rendered as the gitops-lab/commit-timestamp annotation on the workload, where
+# the DORA exporter reads lead time from (Phase 7). Supplied at render time, like
+# image.digest: by CI, or by `task sandbox:deploy`. Never committed here.
+commitTimestamp: ""
+
 # Deployment only until Phase 6 adds Rollout — the one conditional that earns
 # its place.
 workload: Deployment

@@ -1,11 +1,12 @@
 # A complete, valid values set — the baseline every negative case in run.sh
 # breaks exactly one thing in.
-chartVersion: 0.1.0
+chartVersion: 0.2.0
 name: storefront
 version: v1
 image:
   repository: ghcr.io/bo-jr/bo-storefront
   digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+commitTimestamp: "2026-09-30T14:05:00Z"
 workload: Deployment
 replicas: 1
 dependencies: [catalog, pricing]

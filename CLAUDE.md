@@ -47,16 +47,24 @@ something different from what the cluster sees.
 ## Each service supplies
 
 ```yaml
-chartVersion: 0.1.0                # must equal the chart's own version
+chartVersion: 0.2.0                # must equal the chart's own version
 name: storefront                   # WITHOUT the bo- prefix
 version: v1                        # APP_VERSION + the pod's `version` label; never a SHA
 image:
   repository: ghcr.io/bo-jr/bo-storefront   # WITH the prefix
   digest: "sha256:..."             # manifest-list index digest, never per-arch
+commitTimestamp: "2026-09-30T14:05:00Z"   # RFC3339 UTC committer date
 workload: Deployment               # Rollout arrives in Phase 6
 dependencies: [catalog, pricing]
 env: { FAILURE_RATE: "0", EXTRA_LATENCY_MS: "0" }
 ```
+
+`image.digest` and `commitTimestamp` are **supplied at render time**, never committed in a
+service repo: by CI (`bo-platform/scripts/render-service.sh`) or by `task sandbox:deploy`.
+`commitTimestamp` becomes the `gitops-lab/commit-timestamp` annotation on the workload's
+own metadata, and nowhere else: not the pod template (a timestamp alone must never restart
+pods) and not the Service or ServiceAccount (they must not diff between builds). It is
+what makes DORA lead time measurable in Phase 7 (bo-platform DECISIONS.md 2026-09-30).
 
 **The `bo-` prefix stops at the repo boundary.** `name` is `storefront`;
 `image.repository` carries `bo-` only because `ghcr.io/${{ github.repository }}` resolves
